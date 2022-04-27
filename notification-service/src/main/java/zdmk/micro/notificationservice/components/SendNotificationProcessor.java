@@ -1,10 +1,10 @@
-package zdmk.micro.mailservice.components;
+package zdmk.micro.notificationservice.components;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import zdmk.micro.mailservice.interfaces.NotificationSender;
-import zdmk.micro.mailservice.interfaces.SendMailDataQueue;
+import zdmk.micro.notificationservice.interfaces.NotificationSender;
+import zdmk.micro.notificationservice.interfaces.SendNotificationDataQueue;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -24,7 +24,7 @@ public class SendNotificationProcessor implements Runnable, DisposableBean {
 
     private final Map<String, String> protocolProcessors;
     private SenderThreadPool pool;
-    private SendMailDataQueue queue;
+    private SendNotificationDataQueue queue;
 
     {
         logger = Logger.getLogger(SendNotificationProcessor.class.getName());
@@ -43,14 +43,14 @@ public class SendNotificationProcessor implements Runnable, DisposableBean {
     }
 
     @Autowired
-    public void setQueue(SendMailDataQueue queue) {
+    public void setQueue(SendNotificationDataQueue queue) {
         this.queue = queue;
     }
 
     private void processNotifications() {
         while (sendNotifications) {
-            zdmk.micro.mailservice.protos.MailData task = queue.getTask();
-            if(task == null) continue;
+            zdmk.micro.notificationservice.protos.NotificationData task = queue.getTask();
+            if (task == null) continue;
             String messageProcessorBeanName = protocolProcessors.get(task.getConnectionInfo().getProtocol());
             senders.get(messageProcessorBeanName).processMessage(task);
         }
@@ -73,7 +73,12 @@ public class SendNotificationProcessor implements Runnable, DisposableBean {
     public void destroy() {
         logger.info("Notification processor stopped.");
         this.sendNotifications = false;
-        senders.values().forEach(v -> { try { v.destroy(); } catch (Exception ignored) {}});
+        senders.values().forEach(v -> {
+            try {
+                v.destroy();
+            } catch (Exception ignored) {
+            }
+        });
     }
 
     @Override

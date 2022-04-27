@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package micro.mailservice;
+package micro.notificationservice;
 
-option java_package = "zdmk.micro.mailservice.protos";
-option java_outer_classname = "MailService";
+option java_package = "zdmk.micro.notificationservice.protos";
+//option java_outer_classname = "NotificationService";
 option java_multiple_files = true;
 option java_generic_services = true;
 
-service MailSender {
-  rpc SendMail(MailData) returns (SendEventInfo);
+service NotificationService {
+  rpc SendMail(NotificationData) returns (SendEventInfo);
 }
 
 message SendEventInfo {
@@ -16,7 +16,7 @@ message SendEventInfo {
   string message = 2;
 }
 
-message MailData {
+message NotificationData {
   ConnectionInfo connectionInfo = 1;
   repeated string receiver = 2;
   string content = 3;

@@ -1,4 +1,4 @@
-package zdmk.micro.mailservice.components;
+package zdmk.micro.notificationservice.components;
 
 import io.grpc.BindableService;
 import io.grpc.Server;
@@ -6,7 +6,7 @@ import io.grpc.ServerBuilder;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import zdmk.micro.mailservice.interfaces.GRPCServiceBean;
+import zdmk.micro.notificationservice.interfaces.GRPCServiceBean;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package zdmk.micro.mailservice;
+package zdmk.micro.notificationservice;
 
 import com.google.protobuf.ProtocolStringList;
 import io.grpc.stub.StreamObserver;
@@ -6,17 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
-import zdmk.micro.mailservice.interfaces.GRPCServiceBean;
-import zdmk.micro.mailservice.interfaces.SendMailDataQueue;
-import zdmk.micro.mailservice.protos.ConnectionInfo;
-import zdmk.micro.mailservice.protos.SendEventInfo;
+import zdmk.micro.notificationservice.interfaces.GRPCServiceBean;
+import zdmk.micro.notificationservice.interfaces.SendNotificationDataQueue;
+import zdmk.micro.notificationservice.protos.ConnectionInfo;
+import zdmk.micro.notificationservice.protos.NotificationServiceGrpc;
+import zdmk.micro.notificationservice.protos.SendEventInfo;
 
 import java.lang.reflect.Field;
 import java.util.logging.Logger;
 
 @Component
-public class MailSenderGrpcImpl
-        extends zdmk.micro.mailservice.protos.MailSenderGrpc.MailSenderImplBase
+public class NotificationSenderGrpcImpl
+        extends NotificationServiceGrpc.NotificationServiceImplBase
         implements GRPCServiceBean {
 
     Logger logger;
@@ -25,20 +26,20 @@ public class MailSenderGrpcImpl
         logger = Logger.getLogger(this.getClass().getName());
     }
 
-    private SendMailDataQueue queue;
+    private SendNotificationDataQueue queue;
 
-    private final zdmk.micro.mailservice.protos.ConnectionInfo defaultConnectionInfo;
+    private final zdmk.micro.notificationservice.protos.ConnectionInfo defaultConnectionInfo;
 
-    public MailSenderGrpcImpl(@Qualifier("defaultEmailConnectionInfo") ConnectionInfo defaultConnectionInfo) {
+    public NotificationSenderGrpcImpl(@Qualifier("defaultEmailConnectionInfo") ConnectionInfo defaultConnectionInfo) {
         this.defaultConnectionInfo = defaultConnectionInfo;
     }
 
     @Autowired
-    private void setQueue(SendMailDataQueue queue) {
+    private void setQueue(SendNotificationDataQueue queue) {
         this.queue = queue;
     }
 
-    private boolean isMailDataInitializedCorrectly(zdmk.micro.mailservice.protos.MailData mailData) {
+    private boolean isMailDataInitializedCorrectly(zdmk.micro.notificationservice.protos.NotificationData mailData) {
         // if the encoded message __does not contain__ a particular singular element,
         // the corresponding field in the parsed object **is set to the default value** for that field
         // Boolean checking way
@@ -65,8 +66,8 @@ public class MailSenderGrpcImpl
     }
 
     @Override
-    public void sendMail(zdmk.micro.mailservice.protos.MailData request,
-             StreamObserver<zdmk.micro.mailservice.protos.SendEventInfo> responseObserver) {
+    public void sendMail(zdmk.micro.notificationservice.protos.NotificationData request,
+             StreamObserver<zdmk.micro.notificationservice.protos.SendEventInfo> responseObserver) {
 
         queue.addTask(request);
 

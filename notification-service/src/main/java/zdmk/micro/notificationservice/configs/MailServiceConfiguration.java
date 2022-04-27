@@ -1,4 +1,4 @@
-package zdmk.micro.mailservice.configs;
+package zdmk.micro.notificationservice.configs;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 public class MailServiceConfiguration {
 
     @Bean
-    public zdmk.micro.mailservice.protos.ConnectionInfo defaultEmailConnectionInfo() {
+    public zdmk.micro.notificationservice.protos.ConnectionInfo defaultEmailConnectionInfo() {
         Logger logger = Logger.getLogger(this.getClass().getName());
 
         Map<String, String> env = System.getenv();
@@ -23,8 +23,8 @@ public class MailServiceConfiguration {
         } catch (NumberFormatException ignored) {}
         String defaultAddress = env.getOrDefault("ZDMK_MS_DEFAULT_ADDRESS", "localhost");  // To not connect anywhere accidentally
 
-        zdmk.micro.mailservice.protos.ConnectionInfo info =
-                zdmk.micro.mailservice.protos.ConnectionInfo
+        zdmk.micro.notificationservice.protos.ConnectionInfo info =
+                zdmk.micro.notificationservice.protos.ConnectionInfo
                         .newBuilder()
                         .setProtocol(defaultProtocol)
                         .setPort(defaultPort)

@@ -1,4 +1,4 @@
-package zdmk.micro.mailservice.interfaces;
+package zdmk.micro.notificationservice.interfaces;
 
 
 /**

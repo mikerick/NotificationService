@@ -1,9 +1,9 @@
-package zdmk.micro.mailservice.components.senders;
+package zdmk.micro.notificationservice.components.senders;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
-import zdmk.micro.mailservice.interfaces.NotificationSender;
+import zdmk.micro.notificationservice.interfaces.NotificationSender;
 
 import java.util.List;
 import java.util.Properties;
@@ -16,7 +16,7 @@ public class EmailNotificationSender implements NotificationSender {
 
     private final Logger logger;
 
-    private final LinkedBlockingQueue<zdmk.micro.mailservice.protos.MailData> queue;
+    private final LinkedBlockingQueue<zdmk.micro.notificationservice.protos.NotificationData> queue;
 
     private volatile boolean stop;
 
@@ -30,7 +30,7 @@ public class EmailNotificationSender implements NotificationSender {
     public void run() {
         logger.info("Sender instance started");
         while (!stop) {
-            zdmk.micro.mailservice.protos.MailData task;
+            zdmk.micro.notificationservice.protos.NotificationData task;
             try {
                 task = queue.poll(5, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
@@ -40,7 +40,7 @@ public class EmailNotificationSender implements NotificationSender {
                 continue;
             }
             JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
-            zdmk.micro.mailservice.protos.ConnectionInfo connectionInfo = task.getConnectionInfo();
+            zdmk.micro.notificationservice.protos.ConnectionInfo connectionInfo = task.getConnectionInfo();
 
             javaMailSender.setProtocol(connectionInfo.getProtocol());
             javaMailSender.setHost(connectionInfo.getAddress());
@@ -76,7 +76,7 @@ public class EmailNotificationSender implements NotificationSender {
     }
 
     @Override
-    public void processMessage(zdmk.micro.mailservice.protos.MailData mailData) {
+    public void processMessage(zdmk.micro.notificationservice.protos.NotificationData mailData) {
         queue.offer(mailData);
     }
 

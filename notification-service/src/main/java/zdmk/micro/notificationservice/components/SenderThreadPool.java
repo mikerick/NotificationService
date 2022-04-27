@@ -1,4 +1,4 @@
-package zdmk.micro.mailservice.components;
+package zdmk.micro.notificationservice.components;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
