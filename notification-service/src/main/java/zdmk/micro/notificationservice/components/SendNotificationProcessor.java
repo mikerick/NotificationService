@@ -52,6 +52,10 @@ public class SendNotificationProcessor implements Runnable, DisposableBean {
             zdmk.micro.notificationservice.protos.NotificationData task = queue.getTask();
             if (task == null) continue;
             String messageProcessorBeanName = protocolProcessors.get(task.getConnectionInfo().getProtocol());
+            if(messageProcessorBeanName == null) {
+                logger.info("No such protocol: " + task.getConnectionInfo().getProtocol());
+                continue;
+            }
             senders.get(messageProcessorBeanName).processMessage(task);
         }
     }

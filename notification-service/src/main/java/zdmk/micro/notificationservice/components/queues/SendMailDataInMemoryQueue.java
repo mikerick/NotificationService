@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import zdmk.micro.notificationservice.interfaces.SendNotificationDataQueue;
 
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 @Component
 @Qualifier("sendMailDataInMemoryQueue")
@@ -24,7 +23,9 @@ public class SendMailDataInMemoryQueue implements SendNotificationDataQueue {
     @Override
     public zdmk.micro.notificationservice.protos.NotificationData getTask() {
         try {
-            return mailToSend.poll(1, TimeUnit.SECONDS);
+            return mailToSend.take();
         } catch (InterruptedException ignored) {return null;}
     }
+
+
 }

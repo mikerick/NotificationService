@@ -4,11 +4,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
 import zdmk.micro.notificationservice.interfaces.NotificationSender;
+import zdmk.micro.notificationservice.protos.NotificationData;
 
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 @Component
@@ -26,19 +26,28 @@ public class EmailNotificationSender implements NotificationSender {
         stop = false;
     }
 
+    private boolean isFilledCorrectly(NotificationData notificationRequest) {
+        if(!notificationRequest.hasSubject() || notificationRequest.getSubject().equals("")) return false;
+        if(notificationRequest.getContent().equals("")) return false;
+        // TODO 
+        return true;
+    }
+
     @Override
     public void run() {
         logger.info("Sender instance started");
         while (!stop) {
             zdmk.micro.notificationservice.protos.NotificationData task;
             try {
-                task = queue.poll(5, TimeUnit.SECONDS);
+                task = queue.take();
             } catch (InterruptedException e) {
                 break;
             }
             if (task == null) {
                 continue;
             }
+            if(!isFilledCorrectly(task)) continue;
+
             JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
             zdmk.micro.notificationservice.protos.ConnectionInfo connectionInfo = task.getConnectionInfo();
 
@@ -50,9 +59,11 @@ public class EmailNotificationSender implements NotificationSender {
 
             Properties props = javaMailSender.getJavaMailProperties();
             props.put("mail.transport.protocol", connectionInfo.getProtocol());
-            if (connectionInfo.getProtocol().equals("smtp") || connectionInfo.getProtocol().equals("smtps")) {
+
+            if (connectionInfo.getProtocol().startsWith("smtp") || connectionInfo.getProtocol().equals("smtps")) {
                 props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.starttls.enable", "true");
+                if(connectionInfo.getProtocol().equals("smpts"))
+                    props.put("mail.smtp.starttls.enable", "true");
             }
             props.put("mail.debug", "false");
 
